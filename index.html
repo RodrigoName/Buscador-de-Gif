@@ -1,58 +1,157 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador de Gifs</title>
-    <script src="assets/jquery.min.js"></script>
-    <script src="assets/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="assets/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/style.css">
+<html>
+
+<head >
+
+    <title>Rodrigo Ferreira da Silva</title>
+    <style>
+
+body {
+    background-color: rgb(25, 92, 194); /* Substitua "gray" pelo código de cor que você desejar */
+}
+
+        img {
+    max-width: 100%;
+    height: auto;
+            }
+
+         /* Tamanho de fonte responsivo */
+        p {
+        font-size: 1.5rem; /* Exemplo: 1.5 vezes o tamanho padrão */
+        }
+
+        @media (max-width: 768px) {
+         /* Estilos para telas menores */
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            /* Estilos para telas médias */
+        }
+
+        @media (min-width: 1025px) {
+            /* Estilos para telas maiores */
+        }
+    </style>
 </head>
+<script>
+
+// url Async requesting function
+function httpGetAsync(theUrl, callback)
+{
+    // create the request object
+    var xmlHttp = new XMLHttpRequest();
+
+    // set the state change callback to capture when the response comes in
+    xmlHttp.onreadystatechange = function()
+    {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+        {
+            callback(xmlHttp.responseText);
+        }
+    }
+
+    // open as a GET call, pass in the url and set async = True
+    xmlHttp.open("GET", theUrl, true);
+
+    // call send with no params as they were passed in on the url string
+    xmlHttp.send(null);
+
+    return;
+}
+
+// callback for the top 8 GIFs of search
+function tenorCallback_search(responsetext)
+{
+    // Parse the JSON response
+    var response_objects = JSON.parse(responsetext);
+
+    top_8_gifs = response_objects["results"];
+
+    // Create a container div to hold the GIFs
+    var container = document.getElementById("gifContainer");
+
+    // Clear the container before adding new GIFs
+    container.innerHTML = "";
+
+    // Loop through the top 8 GIFs and create image elements for each one
+    for (var i = 0; i < top_8_gifs.length; i++) {
+        var gifUrl = top_8_gifs[i]["media_formats"]["nanogif"]["url"];
+
+        // Create an image element for the GIF
+        var img = document.createElement("img");
+        img.src = gifUrl;
+        img.alt = "GIF " + (i + 1);
+        img.style.width = "220px";
+        img.style.height = "164px";
+
+        // Append the image to the container
+        container.appendChild(img);
+    }
+
+    return;
+}
+
+// function to call the trending and category endpoints
+function grab_data(search_term)
+{
+    // set the apikey and limit
+    var apikey = "AIzaSyDINFSNh7AH_RzSttrGjVA7Ogn83XFHOj0";
+    var clientkey = "my_test_app";
+    var lmt = 8;
+
+    // using default locale of en_US
+    var search_url = "https://tenor.googleapis.com/v2/search?q=" + search_term + "&key=" +
+            apikey +"&client_key=" + clientkey +  "&limit=" + lmt;
+
+    httpGetAsync(search_url, tenorCallback_search);
+
+    // data will be loaded by each call's callback
+    return;
+}
+
+// Function to handle the search button click and Enter key press
+function searchGifs(event) {
+    if (event.type === "click" || (event.type === "keydown" && event.key === "Enter")) {
+        // Get the search term from the input field
+        var searchInput = document.getElementById("searchInput");
+        var search_term = searchInput.value;
+
+        // Call the grab_data function with the search term
+        grab_data(search_term);
+    }
+}
+
+</script>
 <body>
-    <nav class="navbar navbar-light bg-light">
-        <div class="container">
-            <a href="" class="navbar-brand h1">Busca GiF</a>
-            <a href="" class="btn btn-secondary">Leia</a>
-        </div>    
-    </nav>
-    <div class="jumbotron bg-primary">
-        <h1 class="text-center">Busque seu gif abaixo:</h1><br>
-        <input id="texto" type="text" class="form-control" onkeypress="latencia()">
-    </div> 
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col"></div>
-        </div>
-        <div class="row mb-5">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col"></div>
-        </div>
-        <div class="row mb-5">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col"></div>
-        </div>
-        <div class="row mb-5">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col"></div>
-        </div>
-        <div class="row mb-5">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col"></div>
-        </div>
-        <div class="row mb-5">
-            <div class="col"></div>
-            <div class="col"></div>
-            <div class="col"></div>
-        </div>
-    </div>
-    <script src="assets/script.js"></script>
+
+    <h1>Search GIF</h1>
+
+<style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centraliza verticalmente */
+            align-items: center; /* Centraliza horizontalmente */
+            height: 100vh; /* Ajusta a altura para preencher a tela inteira */
+            }
+
+        h1 {
+            text-align: center;
+            border: 2px solid black;
+            padding: 10px;
+            max-width: 80%;
+        }
+    </style>
+
+
+<!-- Add an input field for the search term -->
+<input type="text" id="searchInput" placeholder="Search for GIFs" onkeydown="searchGifs(event)">
+
+<!-- Add a button to trigger the search -->
+<button onclick="searchGifs(event)">Search</button>
+
+<!-- Container to display the loaded GIFs side by side -->
+<div id="gifContainer"></div>
+
 </body>
 </html>
